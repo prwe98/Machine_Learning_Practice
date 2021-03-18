@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 
 from collections import OrderedDict
 
-from BestPractices.notebooks.CBFV.cbfv.composition import generate_features as gf
+from CBFV.cbfv.composition import generate_features as gf
 
 from sklearn.preprocessing import RobustScaler
 from sklearn.preprocessing import StandardScaler
@@ -42,9 +42,9 @@ np.random.seed(RNG_SEED)
 torch.manual_seed(RNG_SEED)
 
 PATH = os.getcwd()
-train_path = os.path.join(PATH, 'BestPractices/data/cp_train.csv')
-test_path = os.path.join(PATH, 'BestPractices/data/cp_test.csv')
-val_path = os.path.join(PATH, 'BestPractices/data/cp_val.csv')
+train_path = os.path.join(PATH, 'cp_train.csv')
+test_path = os.path.join(PATH, 'cp_test.csv')
+val_path = os.path.join(PATH, 'cp_val.csv')
 
 df_train = pd.read_csv(train_path)
 df_test = pd.read_csv(test_path)
@@ -81,6 +81,7 @@ X_train = normalize(X_train)
 X_test = normalize(X_test)
 X_val = normalize(X_val)
 
+
 # Building a neural network
 # define the network in PyTorch
 class DenseNet(nn.Module):
@@ -102,7 +103,7 @@ class DenseNet(nn.Module):
     '''
 
     def __init__(self, input_dims, hidden_dims=[64, 32], output_dims=1, dropout=0.0):
-        super.__init__()
+        super().__init__()
 
         self.input_dims = input_dims
         self.hidden_dims = hidden_dims
@@ -112,27 +113,28 @@ class DenseNet(nn.Module):
 
         # Bulid a sub-block of linear network
         def fc_block(in_dim, out_dim, *args, **kwargs):
+
             return nn.Sequential(nn.Linear(in_dim, out_dim, *args, **kwargs),
                                  nn.Dropout(p=self.dropout),
                                  nn.LeakyReLU())
 
         # build overall networks architecture
         self.networks = nn.ModuleList([
-                nn.Sequential(
-                    nn.Linear(input_dims, self.hidden_dims[0]),
-                    nn.Dropout(p=self.dropout),
-                    nn.LeakyReLU())
-                ]
+            nn.Sequential(
+                nn.Linear(input_dims, self.hidden_dims[0]),
+                nn.Dropout(p=self.dropout),
+                nn.LeakyReLU())
+        ]
         )
 
         hidden_layer_sizes = zip(self.hidden_dims[:-1], self.hidden_dims[1:])
         self.network.extend([
-            fc_block(in_dim, out_dim) for in_dim, out_dim in hidden_layer_sizes]
-        )
+            fc_block(in_dim, out_dim) for in_dim, out_dim
+            in hidden_layer_sizes]
+            )
 
-        self.network.extend([
-            nn.Linear(hidden_dims[-1], output_dims)
-        ])
+        self.network.extend([nn.Linear(hidden_dims[-1], output_dims)])
+
     def forward(self, x):
         '''
         forward pass of the DenseNet model.
@@ -152,6 +154,7 @@ class DenseNet(nn.Module):
 
         return y
 
+
 CUDA_available = torch.cuda.is_available()
 print(f'CUDA is available: {CUDA_available}')
 
@@ -160,6 +163,7 @@ if CUDA_available:
 else:
     compute_device = torch.device('cpu')
 print(f'Compute device for PyTorch: {compute_device}')
+
 
 # defining the data loader and dataset structure
 class CBFVDataLoader():
@@ -176,9 +180,9 @@ class CBFVDataLoader():
     shuffle: bool, optional (default=True)
         Whether to shuffle the datasets or not
     '''
-    def __init__(self, train_data, test_data, val_data,
-                 batch_size=64, num_workers=1,random_state=42, shuffle=True, pin_memory=True):
 
+    def __init__(self, train_data, test_data, val_data,
+                 batch_size=64, num_workers=1, random_state=42, shuffle=True, pin_memory=True):
         self.train_data = train_data
         self.test_data = test_data
         self.val_data = val_data
@@ -191,9 +195,9 @@ class CBFVDataLoader():
         self.random_state = random_state
 
     def get_data_loaders(self, batch_size=1):
-        train_dataset = CBFVDataLoader(self.train_data)
-        test_dataset = CBFVDataLoader(self.test_data)
-        val_dataset = CBFVDataLoader(self.val_data)
+        train_dataset = CBFVDataset(self.train_data)
+        test_dataset = CBFVDataset(self.test_data)
+        val_dataset = CBFVDataset(self.val_data)
 
         train_loader = DataLoader(train_dataset,
                                   batch_size=self.batch_size,
@@ -211,6 +215,7 @@ class CBFVDataLoader():
                                 shuffle=self.shuffle)
 
         return train_loader, test_loader, val_loader
+
 
 class CBFVDataset(Dataset):
     '''
@@ -240,16 +245,16 @@ class CBFVDataset(Dataset):
 
         return (X, y)
 
+
 train_data = (X_train, y_train)
-val_data = (X_val, y_val)
 test_data = (X_test, y_test)
+val_data = (X_val, y_val)
+
 
 # Instantiate the DataLoader
 batch_size = 128
-data_loaders = CBFVDataLoader(train_data, val_data, test_data, batch_size=batch_size)
-train_loader, val_loader, test_loader = data_loaders.get_data_loaders()
-
-
+data_loaders = CBFVDataLoader(train_data, test_data, val_data, batch_size=batch_size)
+train_loader, test_loader, val_loader = data_loaders.get_data_loaders()
 
 # Instantiate the DenseNet model
 # Get input dimension size from the Dataset
@@ -258,8 +263,6 @@ input_dims = example_data.shape[-1]
 
 model = DenseNet(input_dims, hidden_dims=[16], dropout=0.0)
 print(model)
-
-
 
 # defining the loss criterion and optimizer
 # instantiate the loss criterion
@@ -274,6 +277,7 @@ optim_lr = 1e-2
 optimizer = optim.Adam(model.parameters(), lr=optim_lr)
 print('\nOptimizer: ')
 print(optimizer)
+
 
 # define some scaler function and helper function to evaluate and visualize model results
 class Scaler():
@@ -299,6 +303,7 @@ class Scaler():
     def load_state_dict(self, state_dict):
         self.mean = state_dict['mean']
         self.std = state_dict['std']
+
 
 class MeanLogNormScaler():
     def __init__(self, data):
@@ -350,6 +355,7 @@ def predict(model, data_loader):
 
     return target_list, pred_list
 
+
 def evaluate(target, pred):
     r2 = r2_score(target, pred)
     mae = mean_absolute_error(target, pred)
@@ -357,6 +363,7 @@ def evaluate(target, pred):
     output = (r2, mae, rmse)
 
     return output
+
 
 def print_scores(scores, label=''):
     r2, mae, rmse = scores
@@ -367,9 +374,10 @@ def print_scores(scores, label=''):
 
     return scores
 
+
 def plot_pred_act(act, pred, model, reg_line=True, label=''):
     xy_max = np.max([np.max(act), np.max(pred)])
-    plot = plt.figure(figsize=(6,6))
+    plot = plt.figure(figsize=(6, 6))
     plt.plot(act, pred, 'o', ms=9, mec='k', mfc='silver', alpha=0.4)
     plt.plot([0, xy_max], [0, xy_max], 'k--', label='ideal')
 
@@ -385,11 +393,11 @@ def plot_pred_act(act, pred, model, reg_line=True, label=''):
 
     return plot
 
+
 y_train = [data[1].numpy().tolist() for data in train_loader]
 y_train = [item for sublist in y_train for item in sublist]
 y_train = train_loader.dataset.y
 target_scaler = MeanLogNormScaler(y_train)
-
 
 # Training the neural networks
 data_type = torch.float
@@ -425,7 +433,6 @@ output = model.forward(X).flatten()
 loss = criterion(output.view(-1), y.view(-1))
 loss.backward()
 optimizer.step()
-
 
 target_val, pred_val = predict(model, val_loader)
 scores = evaluate(target_val, pred_val)
