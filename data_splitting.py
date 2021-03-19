@@ -1,3 +1,11 @@
+'''
+-*- coding: utf-8 -*-
+@Name        : modeling_neural_network.py
+@Time        : 2021/3/16 0016 10:13
+@Author      : Xiaoyu Wu
+@Institution : UESTC
+'''
+
 import os
 import numpy as np
 import pandas as pd
@@ -53,6 +61,7 @@ np.random.seed(seed=RNG_SEED)
 
 # store a list of all unique formulae
 all_formulae = unique_formulae.copy()
+
 
 # define the proportional size of the dataset split
 val_size = 0.20

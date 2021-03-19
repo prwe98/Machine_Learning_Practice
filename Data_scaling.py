@@ -1,3 +1,12 @@
+'''
+-*- coding: utf-8 -*-
+@Name        : modeling_neural_network.py
+@Time        : 2021/3/16 0016 10:13
+@Author      : Xiaoyu Wu
+@Institution : UESTC
+'''
+
+
 from sklearn.preprocessing import StandardScaler
 from sklearn.preprocessing import normalize
 from data_featurization import X_train_unscaled, X_test_unscaled, X_val_unscaled

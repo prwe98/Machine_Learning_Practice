@@ -1,3 +1,11 @@
+'''
+-*- coding: utf-8 -*-
+@Name        : modeling_neural_network.py
+@Time        : 2021/3/16 0016 10:13
+@Author      : Xiaoyu Wu
+@Institution : UESTC
+'''
+
 import os
 import matplotlib.pyplot as plt
 import pandas as pd
