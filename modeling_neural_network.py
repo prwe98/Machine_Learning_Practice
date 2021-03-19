@@ -24,7 +24,7 @@ from sklearn.metrics import mean_absolute_error
 from sklearn.metrics import mean_squared_error
 
 import torch
-from torch import nn
+import torch.nn as nn
 from torch.utils.data import Dataset, DataLoader
 
 import torch.optim as optim
@@ -103,7 +103,7 @@ class DenseNet(nn.Module):
     '''
 
     def __init__(self, input_dims, hidden_dims=[64, 32], output_dims=1, dropout=0.0):
-        super().__init__()
+        super(DenseNet, self).__init__()
 
         self.input_dims = input_dims
         self.hidden_dims = hidden_dims
@@ -119,7 +119,7 @@ class DenseNet(nn.Module):
                                  nn.LeakyReLU())
 
         # build overall networks architecture
-        self.networks = nn.ModuleList([
+        self.network = nn.ModuleList([
             nn.Sequential(
                 nn.Linear(input_dims, self.hidden_dims[0]),
                 nn.Dropout(p=self.dropout),
@@ -307,7 +307,7 @@ class Scaler():
 
 class MeanLogNormScaler():
     def __init__(self, data):
-        self.data = torch.as_tenser(data)
+        self.data = torch.as_tensor(data)
         self.logdata = torch.log(self.data)
         self.mean = torch.mean(self.logdata)
         self.std = torch.std(self.logdata)
@@ -342,7 +342,7 @@ def predict(model, data_loader):
             X = X.to(compute_device,
                      dtype=data_type,
                      non_blocking=True)
-            y_act = y_act.cpu().flatten.tolist()
+            y_act = y_act.cpu().flatten().tolist()
             y_pred = model.forward(X).cpu().flatten().tolist()
 
         y_pred = target_scaler.unscale(y_pred).tolist()
