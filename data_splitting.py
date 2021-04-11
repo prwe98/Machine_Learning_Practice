@@ -18,7 +18,7 @@ np.random.seed(seed=RNG_SEED)
 
 # Load the pre-processed dataset
 PATH = os.getcwd()
-data_PATH = os.path.join(PATH, 'BestPractices/data/cp_data_cleaned.csv')
+data_PATH = os.path.join(PATH, 'cp_data_cleaned.csv')
 
 df = pd.read_csv(data_PATH)
 print(f'Full DataFrame shape: {df.shape}')
@@ -39,6 +39,7 @@ print(X_train.shape)
 print(X_test.shape)
 
 # unique() return the value without the repeat and in order
+print('-------------------------------------------------------------')
 
 num_rows = len(X_train)
 print(f'There are in total {num_rows} rows in X_train DataFrame')

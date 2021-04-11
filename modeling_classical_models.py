@@ -1,6 +1,6 @@
 '''
 -*- coding: utf-8 -*-
-@Name        : modeling_neural_network.py
+@Name        : modeling_classical_model.py
 @Time        : 2021/3/16 0016 10:13
 @Author      : Xiaoyu Wu
 @Institution : UESTC
@@ -97,7 +97,7 @@ df_classics = pd.DataFrame(columns=['model_name',
                                     'r2_val',
                                     'mae_val',
                                     'rmse_val'])
-df_classics
+
 # Define the models
 # build a dictionary of model names
 classic_model_names = OrderedDict({'dumr': DummyRegressor,
@@ -136,7 +136,7 @@ def plot_pred_act(act, pred, model, reg_line=True, label=''):
     xy_max = np.max([np.max(act), np.max(pred)])
 
     plot = plt.figure(figsize=(6, 6))
-    plt.plot(act, pred, 'o', ms=9, mec='k', mfc='silver', alpha=0.4)
+    plt.plot(act, pred, 'o', ms=9, mec='k', mfc='cornflowerblue', alpha=0.2)
     plt.plot([0, xy_max], [0, xy_max], 'k--', label='ideal')
     if reg_line:
         polyfit = np.polyfit(act, pred, deg=1)
@@ -176,7 +176,6 @@ print(model)
 X_train_new = np.concatenate((X_train, X_val), axis=0)
 Y_train_new = np.concatenate((Y_train, Y_val), axis=0)  # np.concatenate()用于一维数组的拼接
 
-start_time = time()
 
 model.fit(X_train_new, Y_train_new)
 
@@ -193,6 +192,7 @@ print(f'mae: {mae:0.4f}')
 print(f'rmse: {rmse:0.4f}')
 
 plot_2 = plot_pred_act(Y_act_test, Y_pred_test, model, reg_line=True, label='$\mathrm{c}_\mathrm{p}$ (J / mol k)')
+plot_2.show()
 
 # effect of train/validation/test/dataset split
 X_train_unscaled, Y_train, formulae_train, skipped_train = gf(df_train,
@@ -261,14 +261,14 @@ plt.ylim((0.5, 1.0))
 plt.xlabel('Split #')
 plt.ylabel('$r^2$')
 plt.legend(loc='lower right', framealpha=0.9)
-plot_3.show()
+plt.show()
 
 plot_4 = df_splits.plot('split', ['mae_train', 'mae_val'], kind='bar')
 plt.title(f'Performance of {type(model).__name__}\nwith {len(splits)} different data splits')
 plt.xlabel('Split #')
 plt.ylabel('MAE in $\mathrm{c}_\mathrm{p}$ (J / mol K)')
 plt.legend(loc='lower right', framealpha=0.9)
-plot_4.show()
+plt.show()
 
 avg_r2_val = df_splits['r2_val'].mean()  # mean()在pandas中求取平均值
 avg_mae_val = df_splits['mae_val'].mean()
