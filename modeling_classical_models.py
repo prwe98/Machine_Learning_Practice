@@ -272,6 +272,8 @@ plt.show()
 
 avg_r2_val = df_splits['r2_val'].mean()  # mean()在pandas中求取平均值
 avg_mae_val = df_splits['mae_val'].mean()
+avg_rmse_val = df_splits['rmse_val'].mean()
 
 print(f'Average validation r2: {avg_r2_val:0.4f}')
 print(f'Average validation mae: {avg_mae_val:0.4f}')
+print(f'Average validation rmse: {avg_rmse_val:0.4f}')
