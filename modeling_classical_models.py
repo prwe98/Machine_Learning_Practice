@@ -137,7 +137,7 @@ def plot_pred_act(act, pred, model, reg_line=True, label=''):
     xy_max = np.max([np.max(act), np.max(pred)])
 
     plot = plt.figure(figsize=(6, 6))
-    plt.plot(act, pred, 'o', ms=9, mec='k', mfc='cornflowerblue', alpha=0.2)
+    plt.plot(act, pred, 'o', ms=9, mec='k', mfc='cornflowerblue', alpha=0.5)
     plt.plot([0, xy_max], [0, xy_max], 'k--', label='ideal')
     if reg_line: # 利用numpy拟合数据给出趋势线
         polyfit = np.polyfit(act, pred, deg=1)
@@ -160,7 +160,8 @@ for row in range(df_classics.shape[0]):
     Y_pred_val = model.predict(X_val)
 
     plot = plot_pred_act(Y_act_val, Y_pred_val, model, reg_line=True, label='$\mathrm{c}_\mathrm{p}$ (J / mol k)')
-
+    # plot.show()
+    # plot.savefig(fname='2.tif', format='tif', dpi=600, bbox_inches='tight')
 # re_training the best-performance model on combined train + validation dadasets
 # find the best
 best_row = df_classics.iloc[-1, :].copy()
@@ -258,12 +259,11 @@ df_splits['split'] = df_splits['split'].astype(int)
 print(df_splits)
 
 plot_3 = df_splits.plot('split', ['r2_train', 'r2_val'], kind='bar')
-plt.title(f'Performance of {type(model).__name__}\nwith {len(splits)} different data splits')
+plt.title(f'Performance of {type(model).__name__} with {len(splits)} splits')
 plt.ylim((0.5, 1.0))
-plt.xlabel('Split #')
+plt.xlabel('Split')
 plt.ylabel('$r^2$')
 plt.legend(loc='lower right', framealpha=0.9)
-plt.show()
 
 plot_4 = df_splits.plot('split', ['mae_train', 'mae_val'], kind='bar')
 plt.title(f'Performance of {type(model).__name__}\nwith {len(splits)} different data splits')
