@@ -32,6 +32,7 @@ from sklearn.preprocessing import normalize
 
 from Data_scaling import X_train, X_val, X_test, scaler
 from data_featurization import Y_train, Y_val, Y_test, df_train, df_test, df_val
+import os
 
 pd.set_option('display.max_columns', None)
 pd.set_option('display.width', None)
@@ -138,13 +139,13 @@ def plot_pred_act(act, pred, model, reg_line=True, label=''):
     plot = plt.figure(figsize=(6, 6))
     plt.plot(act, pred, 'o', ms=9, mec='k', mfc='cornflowerblue', alpha=0.2)
     plt.plot([0, xy_max], [0, xy_max], 'k--', label='ideal')
-    if reg_line:
+    if reg_line: # 利用numpy拟合数据给出趋势线
         polyfit = np.polyfit(act, pred, deg=1)
         reg_ys = np.poly1d(polyfit)(np.unique(act))
-        plt.plot(np.unique(act), reg_ys, alpha=0.8, label='linear fit')
+        plt.plot(np.unique(act), reg_ys, color='r', alpha=0.8, label='linear fit')
     plt.axis('scaled')
-    plt.xlabel(f'Actual {label}')
-    plt.ylabel(f'Predicted {label}')
+    plt.xlabel('Actual Heat Capacity(J/mol K)')
+    plt.ylabel('Predicted Heat Capacity(J/mol K)')
     plt.title(f'{type(model).__name__}, r2: {r2_score(act, pred):0.4f}')
     plt.legend(loc='upper left')
 
@@ -193,6 +194,7 @@ print(f'rmse: {rmse:0.4f}')
 
 plot_2 = plot_pred_act(Y_act_test, Y_pred_test, model, reg_line=True, label='$\mathrm{c}_\mathrm{p}$ (J / mol k)')
 plot_2.show()
+# plot_2.savefig(fname='1.tif', format='tif', dpi=600, bbox_inches='tight')
 
 # effect of train/validation/test/dataset split
 X_train_unscaled, Y_train, formulae_train, skipped_train = gf(df_train,
